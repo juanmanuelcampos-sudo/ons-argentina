@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONs Corporativas Argentina — Informe Interactivo · Mayo 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f3ef;
+  --surface:#ffffff;
+  --s2:#eeecea;
+  --s3:#e6e4df;
+  --border:#d8d5ce;
+  --border2:#c8c4bb;
+  --text:#16150f;
+  --muted:#766f5c;
+  --accent:#1b3d6e;
+  --gold:#9a6f00;
+  --gold-bg:#fff8e1;
+  --gold-brd:#e8c84a;
+  --green:#145c2f;
+  --red:#b01c1c;
+  --fn:'Geist','IBM Plex Sans',system-ui,sans-serif;
+  --mono:'Geist Mono','IBM Plex Mono',monospace;
+  /* rating colours */
+  --aaa:#1b3d6e; --aaa-bg:#dbeafe; --aaa-txt:#1e3a70;
+  --aaplus:#1a5436; --aaplus-bg:#dcfce7; --aaplus-txt:#145c2f;
+  --aa:#7a5200; --aa-bg:#fef3c7; --aa-txt:#7a5200;
+  --aaminus:#7c2020; --aaminus-bg:#fee2e2; --aaminus-txt:#7c2020;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fn);background:var(--bg);color:var(--text);font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.page{max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+
+/* ── HEADER ── */
+.hdr{padding-bottom:1.6rem;margin-bottom:2.8rem;border-bottom:2px solid var(--text)}
+.hdr-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.hdr h1{font-size:1.75rem;font-weight:600;line-height:1.15;letter-spacing:-.02em}
+.hdr-sub{color:var(--muted);font-size:13px;margin-top:.35rem}
+.hdr-meta{display:flex;gap:2rem;flex-wrap:wrap;margin-top:1.1rem;font-size:11px;color:var(--muted)}
+.hdr-meta b{color:var(--text);font-weight:500}
+
+/* ── TOC ── */
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:1.1rem 1.4rem;margin-bottom:2.8rem}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
+.toc ol{padding-left:1.2rem}
+.toc li{font-size:12.5px;margin-bottom:3px}
+.toc a{color:var(--accent);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ── SECTION ── */
+.sec{margin-bottom:3.8rem}
+.sec-hdr{display:flex;align-items:baseline;gap:.7rem;margin-bottom:1.3rem;padding-bottom:.65rem;border-bottom:1px solid var(--border)}
+.sec-n{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em}
+.sec-t{font-size:1rem;font-weight:600;letter-spacing:-.01em}
+
+/* ── INFO BOX ── */
+.ibox{background:var(--gold-bg);border:1px solid var(--gold-brd);border-radius:5px;padding:.65rem 1rem;font-size:12px;color:#5c4800;margin-bottom:1.4rem;line-height:1.65}
+.ibox b{font-weight:600}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1.1rem}
+.btn{padding:5px 13px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);font-size:12px;font-family:var(--fn);cursor:pointer;color:var(--text);font-weight:500;transition:background .12s,border-color .12s}
+.btn:hover{background:var(--s2);border-color:var(--muted)}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-p:hover{background:#152e54}
+.chg-ct{font-size:11px;color:var(--muted);padding:4px 0}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:7px 10px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--s2);border-bottom:1px solid var(--border);white-space:nowrap}
+th.r,td.r{text-align:right}
+th.c,td.c{text-align:center}
+td{padding:6px 10px;border-bottom:.5px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf9f5}
+.tk{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent)}
+.nm{font-family:var(--mono);font-size:12px}
+.sect-row td{background:var(--s2)!important;border-bottom:1px solid var(--border)!important;padding:5px 10px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-left:3px solid var(--accent)!important}
+.out-row td{background:var(--gold-bg)!important}
+.out-row td:first-child{border-left:3px solid var(--gold)}
+.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-left:3px;vertical-align:middle}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;font-family:var(--mono);white-space:nowrap}
+.b-aaa{background:var(--aaa-bg);color:var(--aaa-txt)}
+.b-ap{background:var(--aaplus-bg);color:var(--aaplus-txt)}
+.b-aa{background:var(--aa-bg);color:var(--aa-txt)}
+.b-am{background:var(--aaminus-bg);color:var(--aaminus-txt)}
+
+/* price input */
+.pi{font-family:var(--mono);font-size:12px;font-weight:500;width:88px;padding:3px 7px;border:1px solid var(--border2);border-radius:4px;background:var(--s2);color:var(--text);text-align:right;transition:border-color .15s,background .15s}
+.pi:focus{outline:none;border-color:var(--accent);background:#fff}
+.pi.chg{border-color:var(--gold);background:var(--gold-bg)}
+
+/* ── CHARTS ── */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem}
+@media(max-width:680px){.cgrid{grid-template-columns:1fr}}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:1.1rem 1.2rem}
+.cc h4{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.9rem;font-size:11px}
+.li{display:flex;align-items:center;gap:4px;color:var(--muted)}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* ── OUTLIER SUMMARY ── */
+.out-tbl{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:7px;overflow:hidden;font-size:12px}
+.out-tbl thead th{padding:7px 10px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--s2);border-bottom:1px solid var(--border)}
+.out-tbl td{padding:7px 10px;border-bottom:.5px solid var(--border)}
+.out-tbl tr:last-child td{border-bottom:none}
+.sp{font-family:var(--mono);font-weight:600;color:var(--gold)}
+
+/* ── EMISOR CARDS ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.2rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.card-hdr{padding:.9rem 1.1rem .75rem;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem}
+.card-name{font-size:14px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+.card-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.card-stats{display:flex;gap:1.1rem;padding:.75rem 1.1rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.st{flex:1;min-width:70px}
+.st-l{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.st-v{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);margin-top:1px}
+.st-d{font-size:11px;color:var(--gold);font-weight:600}
+.card-body{padding:.9rem 1.1rem;font-size:12.5px;line-height:1.65;color:var(--text)}
+.card-body p{margin-bottom:.55rem}
+.card-body p:last-child{margin-bottom:0}
+
+/* ── FOOTNOTE ── */
+.fn-box{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-eyebrow">Renta Fija Corporativa · Argentina · Hard Dollar</div>
+  <h1>Obligaciones Negociables — Informe Interactivo</h1>
+  <p class="hdr-sub">Precio Dirty editable · TEA y Duración Modificada calculadas sobre condiciones de emisión · Mayo 2026</p>
+  <div class="hdr-meta">
+    <span><b>Instrumentos:</b> 32 ONs USD · Ley Nueva York</span>
+    <span><b>Fuente:</b> Archivo On.xlsx · BYMA</span>
+    <span><b>Precio:</b> expresado por cada 100 de VN</span>
+    <span><b>Convención:</b> cupón semestral · Act/365</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-label">Contenido</div>
+  <ol>
+    <li><a href="#tabla">Tabla interactiva por sector y Rating AR — precio editable</a></li>
+    <li><a href="#curvas">Curvas de rendimiento TEA / Duración Modificada por Rating</a></li>
+    <li><a href="#outliers">Securities sobre la curva — identificación de valor relativo</a></li>
+    <li><a href="#emisores">Reseña de emisores identificados</a></li>
+  </ol>
+</nav>
+
+<!-- ====================================================
+     SECCIÓN 1 – TABLA INTERACTIVA
+===================================================== -->
+<section class="sec" id="tabla">
+  <div class="sec-hdr">
+    <span class="sec-n">01</span>
+    <span class="sec-t">Tabla de bonos por sector y Rating AR</span>
+  </div>
+
+  <div class="ibox">
+    <b>Precio editable:</b> modifique el campo <b>Precio Dirty</b> (USD c/100 VN) para cada especie. <b>TEA</b> y <b>Duración Modificada</b> se recalculan instantáneamente con Newton-Raphson sobre los flujos de caja reales del bono. Los gráficos y la detección de outliers se actualizan en tiempo real. Use <b>Restablecer</b> para volver a los precios originales del archivo.
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-p" id="btnLive" onclick="fetchLivePrices()">⟳ Precios en vivo</button>
+    <button class="btn" onclick="resetAll()">↺ Restablecer</button>
+    <button class="btn" onclick="exportCSV()">↓ Exportar CSV</button>
+    <span id="liveStatus" style="font-size:11px;color:var(--muted)"></span>
+    <span class="chg-ct" id="changeCt"></span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table id="mainTbl">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Emisor</th>
+          <th class="r">Precio Dirty<br><small style="font-weight:400;letter-spacing:0">(USD / 100 VN)</small></th>
+          <th class="r">Δ Precio</th>
+          <th class="r">TEA</th>
+          <th class="r">Dur. Mod.</th>
+          <th class="r">Paridad</th>
+          <th class="c">Rating AR</th>
+          <th class="r">Cupón</th>
+          <th class="r">Vencimiento</th>
+          <th class="r">Mercado</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-top:.55rem">
+    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:4px;vertical-align:middle"></span>
+    Securities identificados con rendimiento sobre la curva de su grupo (mismo sector + mismo Rating AR).
+  </p>
+</section>
+
+<!-- ====================================================
+     SECCIÓN 2 – CURVAS
+===================================================== -->
+<section class="sec" id="curvas">
+  <div class="sec-hdr">
+    <span class="sec-n">02</span>
+    <span class="sec-t">Curvas de rendimiento TEA / Duración Modificada por Rating AR</span>
+  </div>
+  <div class="leg">
+    <span class="li"><span class="ld" style="background:#1b3d6e"></span>AAA</span>
+    <span class="li"><span class="ld" style="background:#1a5436"></span>AA+</span>
+    <span class="li"><span class="ld" style="background:#7a5200"></span>AA</span>
+    <span class="li"><span class="ld" style="background:#7c2020"></span>AA−</span>
+    <span class="li"><span class="ld" style="background:var(--gold);clip-path:polygon(50% 0%,100% 100%,0% 100%)"></span>Outlier (sobre curva)</span>
+  </div>
+  <div class="cc" style="margin-bottom:1.2rem">
+    <h4>Vista consolidada — todos los ratings</h4>
+    <div style="position:relative;width:100%;height:420px">
+      <canvas id="chAll" role="img" aria-label="Scatter TEA vs Duración Modificada todos los bonos"></canvas>
+    </div>
+  </div>
+  <div class="cgrid">
+    <div class="cc"><h4>Rating AAA</h4><div style="position:relative;width:100%;height:310px"><canvas id="chAAA" role="img" aria-label="Scatter AAA"></canvas></div></div>
+    <div class="cc"><h4>Rating AA+</h4><div style="position:relative;width:100%;height:310px"><canvas id="chAAp" role="img" aria-label="Scatter AA+"></canvas></div></div>
+    <div class="cc"><h4>Rating AA</h4><div style="position:relative;width:100%;height:310px"><canvas id="chAA" role="img" aria-label="Scatter AA"></canvas></div></div>
+    <div class="cc"><h4>Rating AA−</h4><div style="position:relative;width:100%;height:310px"><canvas id="chAAm" role="img" aria-label="Scatter AA-"></canvas></div></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     SECCIÓN 3 – OUTLIERS
+===================================================== -->
+<section class="sec" id="outliers">
+  <div class="sec-hdr">
+    <span class="sec-n">03</span>
+    <span class="sec-t">Securities sobre la curva — valor relativo</span>
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:1.1rem;line-height:1.7">
+    Para cada nivel de <b>Rating AR</b> (independientemente del sector o industria del emisor) se ajusta una curva lineal TEA&nbsp;~&nbsp;Dur.&nbsp;Mod. por regresión de mínimos cuadrados sobre todos los bonos del grupo. Se identifican los securities cuyo residuo supera 1.2 desviaciones estándar del grupo (mínimo 30 bps). La tabla se recalcula dinámicamente al modificar precios.
+  </p>
+  <div style="overflow-x:auto">
+    <table class="out-tbl" id="outTbl">
+      <thead>
+        <tr>
+          <th>Ticker</th><th>Emisor</th><th>Sector</th>
+          <th class="c">Rating AR</th><th class="r">TEA actual</th>
+          <th class="r">Dur. Mod.</th><th class="r">TEA curva est.</th>
+          <th class="r">Spread</th>
+        </tr>
+      </thead>
+      <tbody id="outBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ====================================================
+     SECCIÓN 4 – RESEÑAS
+===================================================== -->
+<section class="sec" id="emisores">
+  <div class="sec-hdr">
+    <span class="sec-n">04</span>
+    <span class="sec-t">Reseña de emisores identificados</span>
+  </div>
+  <div class="cards" id="cardGrid"><!-- generadas por JS --></div>
+</section>
+
+<!-- FOOTNOTE -->
+<div class="fn-box">
+  <b>Metodología:</b> Convención de descuento: <b>períodos semestrales exactos</b> — el primer período es fraccionario (días al próximo cupón / días del período), los siguientes son enteros. Se resuelve por Newton-Raphson la tasa semestral r_semi y se obtiene <b>TEA = (1+r_semi)²−1</b>. <b>Duración Modificada</b> = Duración de Macaulay en semestres / (1+r_semi) × 0.5, expresada en años. Paridad = Precio Dirty / (VR × 100). Para bonos con amortizaciones intermedias (YMCIO: 35%/dic-26, 31%/jun-27, 34%/jun-29) el cupón se aplica sobre el saldo de capital vigente. Curva estimada por regresión lineal simple (TEA ~ Dur. Mod.) agrupando todos los bonos del mismo Rating AR; outlier si residuo > max(1.2σ, 30 bps). <b>Este informe no constituye asesoramiento de inversión.</b> Fecha de referencia: mayo 2026.
+</div>
+</div><!-- /page -->
+
+<script>
+// ─────────────────────────────────────────
+// MASTER DATA
+// ─────────────────────────────────────────
+const BONDS = [
+  {ticker:"RC1CO", emisor:"Arcor",                       sector:"Consumo / Alimentos",         ratingAR:"AAA", coupon:0.0760,  vto:"2033-07-31", vr:1.000, mercado:"CCL", precio0:105.10},
+  {ticker:"BYCHO", emisor:"Banco Galicia",               sector:"Bancos",                      ratingAR:"AAA", coupon:0.0775,  vto:"2028-10-10", vr:1.000, mercado:"CCL", precio0:104.00},
+  {ticker:"BACGO", emisor:"Banco Macro",                 sector:"Bancos",                      ratingAR:"AAA", coupon:0.0800,  vto:"2029-06-23", vr:1.000, mercado:"CCL", precio0:105.05},
+  {ticker:"BACHO", emisor:"Banco Macro",                 sector:"Bancos",                      ratingAR:"AAA", coupon:0.0800,  vto:"2031-01-28", vr:1.000, mercado:"CCL", precio0:105.40},
+  {ticker:"CAC5O", emisor:"Capex",                       sector:"Generación Eléctrica",        ratingAR:"AA",  coupon:0.0925,  vto:"2028-08-25", vr:0.625, mercado:"MEP", precio0:66.35},
+  {ticker:"GN49O", emisor:"Genneia",                     sector:"Generación Renovable",        ratingAR:"AA+", coupon:0.0775,  vto:"2033-12-02", vr:1.000, mercado:"CCL", precio0:105.25},
+  {ticker:"IRCPO", emisor:"IRSA",                        sector:"Real Estate",                 ratingAR:"AA-", coupon:0.0800,  vto:"2035-03-31", vr:1.000, mercado:"CCL", precio0:104.80},
+  {ticker:"IRCFO", emisor:"IRSA Prop. Comerciales",      sector:"Real Estate",                 ratingAR:"AA-", coupon:0.0875,  vto:"2028-06-22", vr:0.650, mercado:"CCL", precio0:69.32},
+  {ticker:"RUCDO", emisor:"MSU Energy",                  sector:"Generación Eléctrica",        ratingAR:"AA-", coupon:0.0975,  vto:"2030-12-05", vr:1.000, mercado:"CCL", precio0:105.70},
+  {ticker:"MGCMO", emisor:"Pampa Energía",               sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0795,  vto:"2031-09-10", vr:1.000, mercado:"CCL", precio0:107.05},
+  {ticker:"MGCOO", emisor:"Pampa Energía",               sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07875, vto:"2034-12-16", vr:1.000, mercado:"CCL", precio0:106.50},
+  {ticker:"MGCRO", emisor:"Pampa Energía",               sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0775,  vto:"2037-11-14", vr:1.000, mercado:"CCL", precio0:101.50},
+  {ticker:"PNXCO", emisor:"Pan American Energy",         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0850,  vto:"2032-04-30", vr:1.000, mercado:"CCL", precio0:108.35},
+  {ticker:"PN43O", emisor:"Pan American Energy",         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0775,  vto:"2037-01-15", vr:1.000, mercado:"CCL", precio0:105.40},
+  {ticker:"PLC4O", emisor:"Pluspetrol",                  sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0850,  vto:"2032-05-30", vr:1.000, mercado:"CCL", precio0:109.05},
+  {ticker:"PLC5O", emisor:"Pluspetrol",                  sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.08125, vto:"2031-05-18", vr:1.000, mercado:"CCL", precio0:103.70},
+  {ticker:"RAC7O", emisor:"Raghsa",                      sector:"Real Estate",                 ratingAR:"AA",  coupon:0.0850,  vto:"2032-12-11", vr:1.000, mercado:"MEP", precio0:108.90},
+  {ticker:"TTCAO", emisor:"Tecpetrol",                   sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07625, vto:"2033-01-22", vr:1.000, mercado:"CCL", precio0:105.60},
+  {ticker:"TTCDO", emisor:"Tecpetrol",                   sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07625, vto:"2030-11-03", vr:1.000, mercado:"CCL", precio0:102.85},
+  {ticker:"TLCPO", emisor:"Telecom Argentina",           sector:"Telecomunicaciones",          ratingAR:"AA+", coupon:0.0925,  vto:"2033-05-28", vr:1.000, mercado:"CCL", precio0:110.70},
+  {ticker:"TLCTO", emisor:"Telecom Argentina",           sector:"Telecomunicaciones",          ratingAR:"AA+", coupon:0.0850,  vto:"2036-01-20", vr:1.000, mercado:"CCL", precio0:105.55},
+  {ticker:"TLCMO", emisor:"Telecom Argentina",           sector:"Telecomunicaciones",          ratingAR:"AA+", coupon:0.0950,  vto:"2031-07-18", vr:1.000, mercado:"CCL", precio0:110.00},
+  {ticker:"TSC3O", emisor:"TGS",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0850,  vto:"2031-07-24", vr:1.000, mercado:"MEP", precio0:114.00},
+  {ticker:"TSC4O", emisor:"TGS",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0775,  vto:"2035-11-20", vr:1.000, mercado:"CCL", precio0:102.30},
+  {ticker:"VSCTO", emisor:"Vista Energy Argentina",      sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07625, vto:"2035-12-10", vr:1.000, mercado:"MEP", precio0:110.00},
+  {ticker:"VSCVO", emisor:"Vista Energy Argentina",      sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0850,  vto:"2033-06-10", vr:1.000, mercado:"CCL", precio0:109.60},
+  {ticker:"VSCXO", emisor:"Vista Energy Argentina",      sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07875, vto:"2038-04-08", vr:1.000, mercado:"CCL", precio0:103.45},
+  {ticker:"YMCIO", emisor:"YPF",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0900,  vto:"2029-06-30", vr:1.000, mercado:"CCL", precio0:106.60,
+   amortSchedule:[["2026-12-30",0.35],["2027-06-30",0.31],["2029-06-30",0.34]]},
+  {ticker:"YMCJO", emisor:"YPF",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0700,  vto:"2033-09-30", vr:1.000, mercado:"CCL", precio0:100.90},
+  {ticker:"YMCXO", emisor:"YPF",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0875,  vto:"2031-09-11", vr:1.000, mercado:"CCL", precio0:107.00},
+  {ticker:"YM34O", emisor:"YPF",                         sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.0825,  vto:"2034-01-17", vr:1.000, mercado:"CCL", precio0:106.75},
+  {ticker:"YFCJO", emisor:"YPF Luz",                     sector:"E&P / Oil & Gas",             ratingAR:"AAA", coupon:0.07875, vto:"2032-10-16", vr:1.000, mercado:"CCL", precio0:103.25},
+];
+
+const SECTOR_ORDER = ["E&P / Oil & Gas","Telecomunicaciones","Real Estate","Bancos","Consumo / Alimentos","Generación Renovable","Generación Eléctrica"];
+const RATING_ORDER = ["AAA","AA+","AA","AA-"];
+const R_COLORS = {AAA:"#1b3d6e","AA+":"#1a5436",AA:"#7a5200","AA-":"#7c2020"};
+const BC = {AAA:"b-aaa","AA+":"b-ap",AA:"b-aa","AA-":"b-am"};
+
+// Mutable prices array
+const prices = BONDS.map(b => b.precio0);
+
+// ─────────────────────────────────────────
+// BOND MATH
+// ─────────────────────────────────────────
+const TODAY = new Date("2026-05-21");
+
+function cashFlows(bond) {
+  // ── Convención: t en PERÍODOS SEMESTRALES exactos ──────────────────────
+  // El primer período es fraccionario: frac = días_al_primer_cupón / días_del_período
+  // Los siguientes son enteros: frac+1, frac+2, ...
+  // TEA = (1 + r_semi)^2 − 1   |   DurMod en años = DurMod_semi * 0.5
+
+  const vto = new Date(bond.vto);
+  // Collect semiannual coupon dates walking back from maturity
+  const cpnDates = [];
+  let d = new Date(vto);
+  while (d > TODAY) { cpnDates.unshift(new Date(d)); d.setMonth(d.getMonth() - 6); }
+  if (!cpnDates.length) return [];
+
+  // First coupon date and the preceding coupon date (for period length)
+  const firstCpn  = cpnDates[0];
+  const prevCpn   = new Date(firstCpn); prevCpn.setMonth(prevCpn.getMonth() - 6);
+  const msPerDay  = 86400000;
+  const daysToFirst  = (firstCpn - TODAY) / msPerDay;
+  const daysInPeriod = (firstCpn - prevCpn) / msPerDay;
+  const frac = daysToFirst / daysInPeriod;   // fractional semiannual periods
+
+  // Build amortization schedule (fraction of 100 face at each date)
+  // Default: bullet at maturity
+  const amorts = {};  // date-string → principal amount (out of 100)
+  if (bond.amortSchedule) {
+    for (const [dateStr, pct] of bond.amortSchedule) amorts[dateStr] = pct * (bond.vr ?? 1) * 100;
+  } else {
+    amorts[bond.vto] = (bond.vr ?? 1) * 100;
+  }
+
+  // Merge coupon dates and amortization dates
+  const allDates = [...new Set([
+    ...cpnDates.map(x => x.toISOString().slice(0,10)),
+    ...Object.keys(amorts)
+  ])].map(s => new Date(s)).filter(x => x > TODAY).sort((a,b) => a-b);
+
+  // Assign t in semiannual periods
+  const cpnDateStrs = cpnDates.map(x => x.toISOString().slice(0,10));
+  function tSemi(dd) {
+    const s = dd.toISOString().slice(0,10);
+    const idx = cpnDateStrs.indexOf(s);
+    if (idx >= 0) return frac + idx;
+    // interpolate between surrounding coupon dates
+    const prev = cpnDates.filter(x => x <= dd).at(-1) ?? prevCpn;
+    const next = cpnDates.find(x => x > dd);
+    if (!next) return frac + cpnDates.length - 1;
+    const nextIdx = cpnDateStrs.indexOf(next.toISOString().slice(0,10));
+    const fracWithin = (next - dd) / (next - prev);
+    return frac + nextIdx - fracWithin;
+  }
+
+  const flows = [];
+  let outstanding = (bond.vr ?? 1) * 100;  // start from RESIDUAL outstanding today
+  for (const dd of allDates) {
+    const s = dd.toISOString().slice(0,10);
+    const cpn = bond.coupon / 2 * outstanding;
+    const princ = amorts[s] ?? 0;
+    outstanding -= princ;
+    if (cpn + princ > 0) flows.push({ t: tSemi(dd), cf: cpn + princ });
+  }
+  return flows;
+}
+
+function calcTEA(bond, price) {
+  // Solves for r_semi, returns TEA = (1+r_semi)^2 - 1
+  const flows = cashFlows(bond);
+  if (!flows.length) return null;
+  let r = 0.035;
+  for (let i = 0; i < 300; i++) {
+    let npv = -price, dv = 0;
+    for (const { t, cf } of flows) {
+      const df = Math.pow(1 + r, -t);
+      npv += cf * df;
+      dv -= t * cf * df / (1 + r);
+    }
+    if (Math.abs(dv) < 1e-15) break;
+    const delta = npv / dv;
+    r -= delta;
+    if (Math.abs(delta) < 1e-12) break;
+  }
+  return Math.pow(1 + r, 2) - 1;
+}
+
+function calcDur(bond, tea) {
+  // Returns Modified Duration in YEARS
+  if (tea === null) return null;
+  const r_semi = Math.sqrt(1 + tea) - 1;
+  const flows = cashFlows(bond);
+  if (!flows.length) return null;
+  let sw = 0, s = 0;
+  for (const { t, cf } of flows) {
+    const pv = cf / Math.pow(1 + r_semi, t);
+    sw += t * pv; s += pv;
+  }
+  // sw/s = Macaulay duration in semiannual periods → convert to years × /(1+r_semi)
+  return (sw / s) / (1 + r_semi) * 0.5;
+}
+
+function computeAll() {
+  return BONDS.map((b, i) => {
+    const p = prices[i];
+    const tea = calcTEA(b, p);
+    const dur = calcDur(b, tea);
+    const par = p / (b.vr * 100);
+    return { ...b, price: p, tea, dur, par };
+  });
+}
+
+// ─────────────────────────────────────────
+// OUTLIER DETECTION
+// Linear regression per (sector+ratingAR) group
+// ─────────────────────────────────────────
+function linReg(pts) {
+  const n = pts.length;
+  if (n < 2) return { slope: 0, int: pts[0]?.y ?? 0.075 };
+  const sx = pts.reduce((a, p) => a + p.x, 0);
+  const sy = pts.reduce((a, p) => a + p.y, 0);
+  const sxy = pts.reduce((a, p) => a + p.x * p.y, 0);
+  const sxx = pts.reduce((a, p) => a + p.x * p.x, 0);
+  const den = n * sxx - sx * sx;
+  if (Math.abs(den) < 1e-12) return { slope: 0, int: sy / n };
+  const slope = (n * sxy - sx * sy) / den;
+  return { slope, int: (sy - slope * sx) / n };
+}
+
+function detectOutliers(comp) {
+  // Group ONLY by ratingAR — sector/industry is irrelevant
+  const ratingGroups = {};
+  for (const b of comp) {
+    if (!b.tea || !b.dur || b.skipOutlier) continue;
+    if (!ratingGroups[b.ratingAR]) ratingGroups[b.ratingAR] = [];
+    ratingGroups[b.ratingAR].push(b);
+  }
+
+  const outlierSet = new Set();
+  const outlierData = [];
+
+  for (const [, bds] of Object.entries(ratingGroups)) {
+    if (bds.length < 3) continue;
+    const pts = bds.map(b => ({ x: b.dur, y: b.tea }));
+    const { slope, int } = linReg(pts);
+    const resids = bds.map(b => b.tea - (int + slope * b.dur));
+    const mean = resids.reduce((a, r) => a + r, 0) / resids.length;
+    const std = Math.sqrt(resids.reduce((a, r) => a + (r - mean) ** 2, 0) / resids.length);
+    const thr = Math.max(std * 1.2, 0.003);
+    bds.forEach((b, i) => {
+      if (resids[i] > thr) {
+        outlierSet.add(b.ticker);
+        outlierData.push({ ...b, curveEst: int + slope * b.dur, spread: resids[i] });
+      }
+    });
+  }
+  return { outlierSet, outlierData: outlierData.sort((a, b) => b.spread - a.spread) };
+}
+
+// ─────────────────────────────────────────
+// RENDER TABLE
+// ─────────────────────────────────────────
+function renderTable(comp, outlierSet) {
+  const bySector = {};
+  for (const b of comp) {
+    if (!bySector[b.sector]) bySector[b.sector] = [];
+    bySector[b.sector].push(b);
+  }
+  let html = "";
+  for (const sec of SECTOR_ORDER) {
+    const bds = bySector[sec]; if (!bds) continue;
+    html += `<tr class="sect-row"><td colspan="11">${sec}</td></tr>`;
+    // sort by rating then duration desc within sector
+    bds.sort((a, b) => RATING_ORDER.indexOf(a.ratingAR) - RATING_ORDER.indexOf(b.ratingAR) || (b.dur ?? 0) - (a.dur ?? 0));
+    for (const b of bds) {
+      const idx = BONDS.findIndex(x => x.ticker === b.ticker);
+      const isOut = outlierSet.has(b.ticker);
+      const changed = Math.abs(prices[idx] - BONDS[idx].precio0) > 0.005;
+      const delta = prices[idx] - BONDS[idx].precio0;
+      const dStr = delta === 0 ? `<span style="color:var(--muted)">—</span>`
+        : `<span style="color:${delta > 0 ? 'var(--green)' : 'var(--red)'}">
+            ${delta > 0 ? '+' : ''}${delta.toFixed(2)}</span>`;
+      const teaStr = b.tea !== null ? (b.tea * 100).toFixed(2) + "%" : "—";
+      const durStr = b.dur !== null ? b.dur.toFixed(2) : "—";
+      const parStr = b.par !== null ? (b.par * 100).toFixed(2) + "%" : "—";
+      html += `<tr class="${isOut ? 'out-row' : ''}">
+        <td class="tk">${b.ticker}${isOut ? '<span class="dot"></span>' : ''}</td>
+        <td>${b.emisor}</td>
+        <td class="r">
+          <input class="pi ${changed ? 'chg' : ''}" type="number" step="0.01" min="5" max="250"
+            value="${prices[idx].toFixed(2)}" data-idx="${idx}"
+            oninput="onPrice(this)" onchange="onPrice(this)"/>
+        </td>
+        <td class="r nm">${dStr}</td>
+        <td class="r nm" style="${isOut ? 'color:var(--gold);font-weight:600' : ''}">${teaStr}</td>
+        <td class="r nm">${durStr}</td>
+        <td class="r nm">${parStr}</td>
+        <td class="c"><span class="badge ${BC[b.ratingAR] || 'b-aa'}">${b.ratingAR}</span></td>
+        <td class="r nm" style="font-size:11px">${(b.coupon * 100).toFixed(3)}%</td>
+        <td class="r" style="font-size:11px;color:var(--muted)">${b.vto}</td>
+        <td class="c" style="font-size:11px;color:var(--muted)">${b.mercado}</td>
+      </tr>`;
+    }
+  }
+  document.getElementById("tblBody").innerHTML = html;
+  const n = prices.filter((p, i) => Math.abs(p - BONDS[i].precio0) > 0.005).length;
+  document.getElementById("changeCt").textContent = n ? `${n} precio${n > 1 ? 's' : ''} modificado${n > 1 ? 's' : ''}` : "";
+}
+
+// ─────────────────────────────────────────
+// RENDER OUTLIER TABLE
+// ─────────────────────────────────────────
+function renderOutlierTable(outlierData) {
+  const tb = document.getElementById("outBody");
+  if (!outlierData.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:1.2rem">No se detectaron outliers con los precios actuales.</td></tr>';
+    return;
+  }
+  tb.innerHTML = outlierData.map(b => `
+    <tr>
+      <td class="tk">${b.ticker}</td>
+      <td>${b.emisor}</td>
+      <td style="font-size:11px;color:var(--muted)">${b.sector}</td>
+      <td class="c"><span class="badge ${BC[b.ratingAR] || 'b-aa'}">${b.ratingAR}</span></td>
+      <td class="r nm" style="color:var(--gold);font-weight:600">${(b.tea * 100).toFixed(2)}%</td>
+      <td class="r nm">${b.dur.toFixed(2)}</td>
+      <td class="r nm">${(b.curveEst * 100).toFixed(2)}%</td>
+      <td class="r"><span class="sp">+${(b.spread * 10000).toFixed(0)} bps</span></td>
+    </tr>`).join("");
+}
+
+// ─────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────
+const CHART_OPTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { display: true, labels: { font: { size: 10, family: "Geist, sans-serif" }, usePointStyle: true, boxWidth: 8, padding: 8 } },
+    tooltip: { callbacks: { label: c => ` ${c.raw.label}: TEA ${c.raw.y.toFixed(2)}%  Dur. ${c.raw.x.toFixed(2)}` } }
+  },
+  scales: {
+    x: { title: { display: true, text: "Duración Modificada", font: { size: 10 }, color: "#766f5c" }, min: 0, ticks: { font: { size: 9 }, color: "#766f5c" }, grid: { color: "#e0ddd6" } },
+    y: { title: { display: true, text: "TEA (%)", font: { size: 10 }, color: "#766f5c" }, ticks: { font: { size: 9 }, color: "#766f5c", callback: v => v.toFixed(1) + "%" }, grid: { color: "#e0ddd6" } }
+  }
+};
+
+const TICKER_PLUGIN = {
+  id: "tkLabels",
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (meta.hidden) return;
+      meta.data.forEach((pt, i) => {
+        const raw = ds.data[i];
+        if (!raw?.label) return;
+        ctx.save();
+        ctx.font = "500 9.5px 'Geist Mono', monospace";
+        ctx.fillStyle = ds.borderColor;
+        ctx.textAlign = "center";
+        ctx.fillText(raw.label, pt.x, pt.y - 10);
+        ctx.restore();
+      });
+    });
+  }
+};
+
+let charts = {};
+
+function buildDatasets(comp, outlierSet, filterRating) {
+  const filtered = filterRating ? comp.filter(b => b.ratingAR === filterRating) : comp;
+  const ratings = filterRating ? [filterRating]
+    : [...new Set(filtered.map(b => b.ratingAR))].sort((a, b) => RATING_ORDER.indexOf(a) - RATING_ORDER.indexOf(b));
+  const ds = [];
+  for (const r of ratings) {
+    const bds = filtered.filter(b => b.ratingAR === r && b.tea && b.dur && !b.skipOutlier);
+    const norm = bds.filter(b => !outlierSet.has(b.ticker));
+    const outs = bds.filter(b => outlierSet.has(b.ticker));
+    if (norm.length) ds.push({
+      label: r, showLine: false,
+      data: norm.map(b => ({ x: +b.dur.toFixed(3), y: +(b.tea * 100).toFixed(4), label: b.ticker })),
+      backgroundColor: R_COLORS[r] + "cc", borderColor: R_COLORS[r],
+      pointRadius: 7, pointHoverRadius: 9
+    });
+    if (outs.length) ds.push({
+      label: r + " ▲ outlier", showLine: false,
+      data: outs.map(b => ({ x: +b.dur.toFixed(3), y: +(b.tea * 100).toFixed(4), label: b.ticker })),
+      backgroundColor: "#9a6f00", borderColor: "#9a6f00",
+      pointRadius: 8, pointHoverRadius: 10, pointStyle: "triangle"
+    });
+  }
+  return ds;
+}
+
+function initCharts(comp, outlierSet) {
+  [
+    { id: "chAll", r: null },
+    { id: "chAAA", r: "AAA" },
+    { id: "chAAp", r: "AA+" },
+    { id: "chAA",  r: "AA"  },
+    { id: "chAAm", r: "AA-" },
+  ].forEach(({ id, r }) => {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById(id).getContext("2d"), {
+      type: "scatter",
+      data: { datasets: buildDatasets(comp, outlierSet, r) },
+      options: JSON.parse(JSON.stringify(CHART_OPTS)),
+      plugins: [TICKER_PLUGIN]
+    });
+  });
+}
+
+function updateCharts(comp, outlierSet) {
+  [
+    { id: "chAll", r: null },
+    { id: "chAAA", r: "AAA" },
+    { id: "chAAp", r: "AA+" },
+    { id: "chAA",  r: "AA"  },
+    { id: "chAAm", r: "AA-" },
+  ].forEach(({ id, r }) => {
+    if (!charts[id]) return;
+    charts[id].data.datasets = buildDatasets(comp, outlierSet, r);
+    charts[id].update("none");
+  });
+}
+
+// ─────────────────────────────────────────
+// EMISOR CARDS — static content
+// ─────────────────────────────────────────
+const EMISOR_INFO = {
+  "MSU Energy": {
+    sector: "Generación Eléctrica",
+    desc: [
+      "MSU Energy es un generador termoeléctrico privado con dos plantas de ciclo combinado en Argentina: Ricardo Güiraldes (Luján, Bs.As.) y Ensenada de Barragán (La Plata). Ambas plantas operan bajo contratos de largo plazo de abastecimiento eléctrico con CAMMESA, con ingresos indexados en dólares.",
+      "El spread elevado de RUCDO refleja su exposición concentrada a los pagos del Fondo de Energía —históricamente demorado— y su calificación global CCC. Con la normalización del mercado eléctrico bajo las reformas energéticas de 2024-2026, los contratos vigentes ofrecen visibilidad de flujo. El bono vence en dic-2030 con cupón del 9.75%.",
+      "Para inversores con tolerancia al riesgo regulatorio sectorial, RUCDO ofrece un spread positivo significativo respecto a la curva AA− que puede ser atractivo en términos de carry ajustado al riesgo."
+    ]
+  },
+  "Capex": {
+    sector: "Generación Eléctrica",
+    desc: [
+      "Capex es un holding energético integrado con operaciones en generación eléctrica (plantas térmicas), exploración y producción de petróleo y gas en la cuenca Neuquina, y servicios relacionados. Cotiza en el mercado local.",
+      "CAC5O es un bono amortizante con valor residual del 62.5%, lo que resulta en una duración reducida y eleva la TEA calculada. El spread destacado incorpora: leverage relativamente alto, rating global CCC, y prima de iliquidez por el tamaño del instrumento. Vence en ago-2028 con cupón del 9.25%.",
+      "La desregulación del sector energético en Argentina (gas en boca de pozo, liberalización eléctrica) es el principal catalizador positivo. La combinación de alto carry y vencimiento próximo puede ser atractiva en el tramo corto de la curva AA."
+    ]
+  },
+  "Raghsa": {
+    sector: "Real Estate",
+    desc: [
+      "Raghsa es una de las principales desarrolladoras inmobiliarias de Argentina, con foco en edificios de oficinas clase A en Buenos Aires (Catalinas, Puerto Madero, Palermo Business) y desarrollos residenciales de alta gama. Posee un portfolio consolidado con elevadas tasas de ocupación.",
+      "RAC7O ofrece una TEA de ~7.6% con duración de ~4.85 años, marcando spread positivo frente a la curva AA del sector. La prima se explica principalmente por el tamaño reducido del instrumento (menor liquidez en mercado secundario) y la ausencia de cobertura institucional amplia.",
+      "La recuperación del mercado de oficinas premium en Buenos Aires post-pandemia, con vacancia decreciente y precios en dólares, respalda la solidez del negocio. El spread de iliquidez puede ser atractivo para inversores con horizonte de mediano plazo. Vence dic-2032 con cupón del 8.50%."
+    ]
+  },
+  "IRSA": {
+    sector: "Real Estate",
+    desc: [
+      "IRSA Inversiones y Representaciones es el mayor conglomerado inmobiliario de Argentina, con participaciones en shopping centers (Alto Palermo, Abasto, Dot, Patio Bullrich), edificios de oficinas clase A, hoteles de lujo (Llao Llao, Intercontinental BsAs) y una participación en Banco Hipotecario.",
+      "IRCPO (ON 2035, 8.00%) muestra spread moderado frente a la curva AA−. La calificación global CCC refleja íntegramente el riesgo soberano argentino —IRSA tiene ingresos en pesos de sus activos locales, con deuda en dólares—, contrastando con el sólido portfolio de activos reales.",
+      "La mejora del entorno macro, la recuperación del consumo en shoppings y la estabilización del tipo de cambio son los principales catalizadores. Para inversores con perspectiva positiva sobre Argentina, IRCPO ofrece exposición a activos reales de calidad a un spread razonable."
+    ]
+  },
+  "IRSA Prop. Comerciales": {
+    sector: "Real Estate",
+    desc: [
+      "IRSA Propiedades Comerciales (IRCP) gestiona el portfolio de shoppings de IRSA: Alto Palermo, Abasto de Buenos Aires, Dot Baires Shopping, Patio Bullrich, Village Cañuelas y otros centros regionales. Sus ingresos provienen de alquileres de locales indexados a ventas.",
+      "IRCFO es un bono amortizante con valor residual del 65% y vencimiento jun-2028. La TEA relativamente baja respecto al resto de su grupo reflejan la proximidad al vencimiento y el perfil de amortización. El spread positivo frente a la curva AA− incorpora el descalce estructural de monedas (ingresos en pesos, deuda en dólares).",
+      "La performance sostenida de ventas en shoppings durante 2025-2026 y la recuperación del salario real son factores positivos para el crédito. Vence jun-2028 con cupón del 8.75%."
+    ]
+  },
+  "Genneia": {
+    sector: "Generación Renovable",
+    desc: [
+      "Genneia es el mayor generador de energías renovables de Argentina, con un portfolio de parques eólicos y solares distribuidos en Chubut, Buenos Aires, Jujuy y San Juan, con capacidad instalada superior a 600 MW. Opera bajo contratos de largo plazo del programa RenovAr, con ingresos en dólares.",
+      "GN49O (8.00% 2033) aparece en el límite del análisis de outliers, dado que dentro del rating AA+ es el único bono de sector renovable frente a los tres bonos de Telecom. La divergencia de sector justifica una lectura cuidadosa: respecto a la curva AAA de energía convencional, GN49O cotiza con spread positivo que refleja su calificación global CCC.",
+      "La mejora en el pago de contratos RenovAr por parte de CAMMESA y la demanda creciente de energía limpia en Argentina son los principales catalizadores. Para inversores con visión positiva sobre el sector renovable argentino, GN49O ofrece carry atractivo en el segmento AA+ con vencimiento 2033."
+    ]
+  },
+};
+
+function renderCards(outlierData) {
+  const grid = document.getElementById("cardGrid");
+  // Build unique emisors from outlierData
+  const seen = new Set();
+  const emisors = [];
+  for (const b of outlierData) {
+    if (!seen.has(b.emisor)) { seen.add(b.emisor); emisors.push(b); }
+  }
+  if (!emisors.length) {
+    grid.innerHTML = '<p style="font-size:12px;color:var(--muted)">No hay outliers detectados con los precios actuales.</p>';
+    return;
+  }
+  grid.innerHTML = emisors.map(b => {
+    const info = EMISOR_INFO[b.emisor];
+    const bc = BC[b.ratingAR] || "b-aa";
+    const desc = info ? info.desc.map(p => `<p>${p}</p>`).join("") : `<p>Información del emisor no disponible.</p>`;
+    return `<div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-name">${b.emisor}</div>
+          <div class="card-sub">${b.ticker} · ${b.sector}</div>
+        </div>
+        <span class="badge ${bc}">${b.ratingAR}</span>
+      </div>
+      <div class="card-stats">
+        <div class="st"><div class="st-l">TEA actual</div><div class="st-v">${(b.tea*100).toFixed(2)}%</div><div class="st-d">+${(b.spread*10000).toFixed(0)} bps s/curva</div></div>
+        <div class="st"><div class="st-l">Dur. Mod.</div><div class="st-v">${b.dur.toFixed(2)}</div></div>
+        <div class="st"><div class="st-l">Vencimiento</div><div class="st-v" style="font-size:12px">${b.vto}</div></div>
+        <div class="st"><div class="st-l">Cupón</div><div class="st-v">${(b.coupon*100).toFixed(3)}%</div></div>
+      </div>
+      <div class="card-body">${desc}</div>
+    </div>`;
+  }).join("");
+}
+
+// ─────────────────────────────────────────
+// MAIN REFRESH
+// ─────────────────────────────────────────
+let firstRender = true;
+
+function refresh() {
+  const comp = computeAll();
+  const { outlierSet, outlierData } = detectOutliers(comp);
+  renderTable(comp, outlierSet);
+  renderOutlierTable(outlierData);
+  renderCards(outlierData);
+  if (firstRender) { initCharts(comp, outlierSet); firstRender = false; }
+  else updateCharts(comp, outlierSet);
+}
+
+function onPrice(input) {
+  const idx = parseInt(input.dataset.idx);
+  const val = parseFloat(input.value);
+  if (isNaN(val) || val < 1) return;
+  prices[idx] = val;
+  input.classList.toggle("chg", Math.abs(val - BONDS[idx].precio0) > 0.005);
+  refresh();
+}
+
+function resetAll() { BONDS.forEach((b, i) => prices[i] = b.precio0); refresh(); }
+
+function exportCSV() {
+  const comp = computeAll();
+  const { outlierSet } = detectOutliers(comp);
+  const rows = [["Ticker","Emisor","Sector","Rating AR","Precio Dirty","TEA %","Dur. Mod.","Paridad %","Outlier","Cupón %","Vencimiento","Mercado"]];
+  for (const b of comp)
+    rows.push([b.ticker, b.emisor, b.sector, b.ratingAR,
+      b.price.toFixed(4), b.tea !== null ? (b.tea*100).toFixed(4) : "",
+      b.dur !== null ? b.dur.toFixed(4) : "",
+      b.par !== null ? (b.par*100).toFixed(4) : "",
+      outlierSet.has(b.ticker) ? "SI" : "NO",
+      (b.coupon*100).toFixed(4), b.vto, b.mercado]);
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csv);
+  a.download = "ONs_Argentina_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+}
+
+// ─────────────────────────────────────────
+// LIVE PRICES FROM /api/precios
+// ─────────────────────────────────────────
+async function fetchLivePrices() {
+  const btn = document.getElementById('btnLive');
+  const status = document.getElementById('liveStatus');
+  btn.disabled = true;
+  btn.textContent = '⟳ Cargando...';
+  status.textContent = '';
+  try {
+    const res = await fetch('/api/precios');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const precios = data.precios || {};
+    let updated = 0;
+    BONDS.forEach((b, i) => {
+      if (precios[b.ticker] != null) {
+        prices[i] = parseFloat(precios[b.ticker]);
+        updated++;
+      }
+    });
+    refresh();
+    const ts = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('es-AR') : '';
+    status.textContent = updated + ' precios actualizados' + (ts ? ' · ' + ts : '');
+    status.style.color = 'var(--green)';
+    if (data.missing && data.missing.length > 0)
+      status.textContent += ' · sin datos: ' + data.missing.join(', ');
+  } catch (err) {
+    status.textContent = 'Error al obtener precios: ' + err.message;
+    status.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⟳ Precios en vivo';
+  }
+}
+
+// Auto-fetch on load if hosted (not file://)
+if (window.location.protocol !== 'file:') {
+  fetchLivePrices();
+}
+
+
+refresh();
+</script>
+</body>
+</html>
