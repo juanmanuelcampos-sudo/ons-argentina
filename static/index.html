@@ -784,45 +784,65 @@ function exportCSV() {
 }
 
 // ─────────────────────────────────────────
-// LIVE PRICES FROM /api/precios
+// LIVE PRICES — fetch directamente desde el browser a BYMA open data
+// BYMA requiere que el request venga de un browser (bloquea server-to-server)
 // ─────────────────────────────────────────
+
+// BYMA devuelve todas las ONs en un solo endpoint — más eficiente que ticker a ticker
+const BYMA_URL = "https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/bnown/obligaciones-negociables";
+
 async function fetchLivePrices() {
   const btn = document.getElementById('btnLive');
-  const status = document.getElementById('liveStatus');
+  const st  = document.getElementById('liveStatus');
   btn.disabled = true;
   btn.textContent = '⟳ Cargando...';
-  status.textContent = '';
+  st.textContent = '';
+  st.style.color = 'var(--muted)';
   try {
-    const res = await fetch('/api/precios');
+    const res = await fetch(BYMA_URL, {
+      headers: { "Content-Type": "application/json" }
+    });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const precios = data.precios || {};
-    let updated = 0;
+    const json = await res.json();
+
+    // La respuesta de BYMA es un array de objetos con symbol y last/trade
+    const rows = json.data ?? json ?? [];
+    const byTicker = {};
+    for (const row of rows) {
+      const tk = (row.symbol ?? row.ticker ?? row.simbolo ?? '').trim().toUpperCase();
+      const price = row.trade ?? row.last ?? row.ultimoPrecio ?? row.close ?? row.price;
+      if (tk && price != null) byTicker[tk] = parseFloat(price);
+    }
+
+    let updated = 0, missing = [];
     BONDS.forEach((b, i) => {
-      if (precios[b.ticker] != null) {
-        prices[i] = parseFloat(precios[b.ticker]);
+      if (byTicker[b.ticker] != null) {
+        prices[i] = byTicker[b.ticker];
         updated++;
+      } else {
+        missing.push(b.ticker);
       }
     });
     refresh();
-    const ts = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('es-AR') : '';
-    status.textContent = updated + ' precios actualizados' + (ts ? ' · ' + ts : '');
-    status.style.color = 'var(--green)';
-    if (data.missing && data.missing.length > 0)
-      status.textContent += ' · sin datos: ' + data.missing.join(', ');
+
+    const now = new Date().toLocaleTimeString('es-AR');
+    st.textContent = updated + ' precios actualizados · ' + now;
+    st.style.color = 'var(--green)';
+    if (missing.length)
+      st.textContent += ' · sin datos: ' + missing.join(', ');
+
   } catch (err) {
-    status.textContent = 'Error al obtener precios: ' + err.message;
-    status.style.color = 'var(--red)';
+    // Si BYMA falla por CORS u otro motivo, mostrar mensaje claro
+    st.textContent = 'No se pudo conectar con BYMA: ' + err.message;
+    st.style.color = 'var(--red)';
   } finally {
     btn.disabled = false;
     btn.textContent = '⟳ Precios en vivo';
   }
 }
 
-// Auto-fetch on load if hosted (not file://)
-if (window.location.protocol !== 'file:') {
-  fetchLivePrices();
-}
+// Auto-fetch al cargar la página
+window.addEventListener('load', fetchLivePrices);
 
 
 refresh();
