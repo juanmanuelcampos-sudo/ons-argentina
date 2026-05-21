@@ -815,7 +815,8 @@ async function fetchLivePrices() {
     refresh();
 
     const now = new Date().toLocaleTimeString('es-AR');
-    st.textContent = updated + ' precios actualizados · ' + now;
+    const cclStr = data.ccl ? ' · CCL $' + data.ccl.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) : ' · CCL no disponible';
+    st.textContent = updated + ' precios actualizados' + cclStr + ' · ' + now;
     st.style.color = 'var(--green)';
     if (data.missing && data.missing.length)
       st.textContent += ' · sin datos: ' + data.missing.join(', ');
