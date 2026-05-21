@@ -789,7 +789,7 @@ function exportCSV() {
 // ─────────────────────────────────────────
 
 // BYMA devuelve todas las ONs en un solo endpoint — más eficiente que ticker a ticker
-const BYMA_URL = "https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/bnown/obligaciones-negociables";
+// Precios servidos por el backend en /api/precios (IOL)
 
 async function fetchLivePrices() {
   const btn = document.getElementById('btnLive');
@@ -799,28 +799,17 @@ async function fetchLivePrices() {
   st.textContent = '';
   st.style.color = 'var(--muted)';
   try {
-    const res = await fetch(BYMA_URL, {
-      headers: { "Content-Type": "application/json" }
-    });
+    const res = await fetch("/api/precios");
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail ?? "Error del servidor");
 
-    // La respuesta de BYMA es un array de objetos con symbol y last/trade
-    const rows = json.data ?? json ?? [];
-    const byTicker = {};
-    for (const row of rows) {
-      const tk = (row.symbol ?? row.ticker ?? row.simbolo ?? '').trim().toUpperCase();
-      const price = row.trade ?? row.last ?? row.ultimoPrecio ?? row.close ?? row.price;
-      if (tk && price != null) byTicker[tk] = parseFloat(price);
-    }
-
-    let updated = 0, missing = [];
+    const precios = data.precios ?? {};
+    let updated = 0;
     BONDS.forEach((b, i) => {
-      if (byTicker[b.ticker] != null) {
-        prices[i] = byTicker[b.ticker];
+      if (precios[b.ticker] != null) {
+        prices[i] = parseFloat(precios[b.ticker]);
         updated++;
-      } else {
-        missing.push(b.ticker);
       }
     });
     refresh();
@@ -828,8 +817,8 @@ async function fetchLivePrices() {
     const now = new Date().toLocaleTimeString('es-AR');
     st.textContent = updated + ' precios actualizados · ' + now;
     st.style.color = 'var(--green)';
-    if (missing.length)
-      st.textContent += ' · sin datos: ' + missing.join(', ');
+    if (data.missing && data.missing.length)
+      st.textContent += ' · sin datos: ' + data.missing.join(', ');
 
   } catch (err) {
     // Si BYMA falla por CORS u otro motivo, mostrar mensaje claro
